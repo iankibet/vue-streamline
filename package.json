@@ -1,6 +1,6 @@
 {
   "name": "@iankibetsh/vue-streamline",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "description": "Vue library for streamlining laravel backend services with @iankibet/streamline composer package",
   "type": "module",
   "scripts": {
@@ -8,10 +8,14 @@
     "build": "vite build",
     "preview": "vite preview"
   },
+  "main": "dist/vue-streamline.es.js",
+  "module": "dist/vue-streamline.umd.js",
   "keywords": [],
   "author": "Iankibet",
   "license": "ISC",
   "peerDependencies": {
+  },
+  "dependencies": {
     "axios": "^1.7.3",
     "vue": "^3.2.4"
   },
