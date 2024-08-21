@@ -36,6 +36,7 @@ const useStreamline = stream => {
                    // return string url with postBody as query params
                     // flatten params object
                     // params are from args 1, unset the first arg
+                    postBody.action = args[0]
                     const params = args.slice(1)
                     if (params.length > 0) {
                         postBody.params = params
