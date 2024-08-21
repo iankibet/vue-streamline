@@ -5,7 +5,7 @@ Vue library for streamlining laravel backend services with @iankibet/streamline 
 ## Installation
 
 ```sh
-npm install @iankibet/vue-streamline
+npm install @iankibetsh/vue-streamline
 ```
 
 ## Usage
