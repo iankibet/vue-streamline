@@ -46,5 +46,5 @@ tasksServices.getTasks().then(response => {
 
 You can get the url to an action/method in the service by calling the getActionUrl method on the service object passing the action name and any parameters
 ```js
- tasksService.getActionUrl('getTasks', {page: 1})
+ tasksService.getActionUrl('getTasks', 'active')
  ```
