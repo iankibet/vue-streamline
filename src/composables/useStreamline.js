@@ -30,14 +30,20 @@ const useStreamline = stream => {
                     }
                 })
                 window.streamlineAxios = axios
-                return axios.post(streamlineUrl, {
+                const postBody = {
                     action,
                     stream,
                     ...formData,
                     params: {
                         ...args
                     }
-                })
+                }
+                const getUrlMethods = ['getUrl','getFullUrl','getActionUrl']
+                if(getUrlMethods.includes(action)) {
+                   // return string url with postBody as query params
+                     return streamlineUrl + '?' + new URLSearchParams(postBody).toString()
+                }
+                return axios.post(streamlineUrl, postBody)
             }
         }
     })
