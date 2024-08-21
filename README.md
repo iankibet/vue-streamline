@@ -24,3 +24,19 @@ Vue.use(streamline, {
     streamlineUrl: 'http://localhost:8000/api/streamline' // The url to the streamline route
 })
 ```
+
+
+## usage in vue component
+
+```js
+import { useStreamline } from '@iankibet/vue-streamline'
+
+
+const {service:tasksService} = useStreamline('tasks')
+
+// call the service methods
+
+tasksServices.getTasks().then(response => {
+    console.log(response)
+})
+```
