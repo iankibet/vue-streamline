@@ -17,7 +17,7 @@ const tryDelete = (id)=>{
 <template>
   <div>
     <h1 @click="tryDelete(1)">Streamline Framework</h1>
-    {{ paybillService.getActionUrl('addPaybill',2,4) }}
+    {{ paybillService.getActionUrl('addPaybill') }}
 
   </div>
 </template>
