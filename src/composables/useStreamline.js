@@ -19,30 +19,27 @@ const useStreamline = stream => {
                     formData = args[0]
                     return service
                 }
-                const config = {
+                const axios =  Axios.create({
                     headers: {
                         ...streamlineHeaders
                     }
-                }
-                const axios =  Axios.create({
-                    headers: {
-                        ...config.headers
-                    }
                 })
+
                 window.streamlineAxios = axios
                 const postBody = {
                     action,
                     stream,
                     ...formData,
-                    params: {
-                        ...args
-                    }
                 }
                 const getUrlMethods = ['getUrl','getFullUrl','getActionUrl']
                 if(getUrlMethods.includes(action)) {
                    // return string url with postBody as query params
+                    // flatten params object
+                    // params are from args 1, unset the first arg
+                    postBody.params = args.slice(1)
                      return streamlineUrl + '?' + new URLSearchParams(postBody).toString()
                 }
+                postBody.params = args
                 return axios.post(streamlineUrl, postBody)
             }
         }
