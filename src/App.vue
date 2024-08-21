@@ -1,9 +1,24 @@
 <script setup>
+import useStreamline from './composables/useStreamline.js'
+
+const {service:paybillService} = useStreamline('mpesa/paybill')
+
+const tryDelete = (id)=>{
+  paybillService.deletePaybill(id).then(res=>{
+    reload.value++
+    shRepo.showToast('Paybill deleted')
+  }).catch(err=>{
+    console.log(err)
+  })
+
+}
 </script>
 
 <template>
   <div>
-    <h1>Streamline Framework</h1>
+    <h1 @click="tryDelete(1)">Streamline Framework</h1>
+    {{ paybillService.getActionUrl('addPaybill',2,4) }}
+
   </div>
 </template>
 
