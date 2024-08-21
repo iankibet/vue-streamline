@@ -18,7 +18,7 @@ import {streamline} from '@iankibetsh/vue-streamline'
 
 ```js
 Vue.use(streamline, {
-    ustreamlineHeaders: {
+    streamlineHeaders: {
         // Add any headers you want to send with the request
     },
     streamlineUrl: 'http://localhost:8000/api/streamline' // The url to the streamline route
