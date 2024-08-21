@@ -25,13 +25,12 @@ const useStreamline = stream => {
                     }
                 }
                 const axios =  Axios.create({
-                    baseURL: streamlineUrl,
                     headers: {
                         ...config.headers
                     }
                 })
                 window.streamlineAxios = axios
-                return axios.post('/', {
+                return axios.post(streamlineUrl, {
                     action,
                     stream,
                     ...formData,

@@ -11,12 +11,12 @@ const { toString: et } = Object.prototype, { getPrototypeOf: ue } = Object, v = 
 function tt(e) {
   return e !== null && !q(e) && e.constructor !== null && !q(e.constructor) && T(e.constructor.isBuffer) && e.constructor.isBuffer(e);
 }
-const Le = C("ArrayBuffer");
+const _e = C("ArrayBuffer");
 function nt(e) {
   let t;
-  return typeof ArrayBuffer < "u" && ArrayBuffer.isView ? t = ArrayBuffer.isView(e) : t = e && e.buffer && Le(e.buffer), t;
+  return typeof ArrayBuffer < "u" && ArrayBuffer.isView ? t = ArrayBuffer.isView(e) : t = e && e.buffer && _e(e.buffer), t;
 }
-const rt = W("string"), T = W("function"), _e = W("number"), K = (e) => e !== null && typeof e == "object", st = (e) => e === !0 || e === !1, z = (e) => {
+const rt = W("string"), T = W("function"), Le = W("number"), K = (e) => e !== null && typeof e == "object", st = (e) => e === !0 || e === !1, z = (e) => {
   if (v(e) !== "object")
     return !1;
   const t = ue(e);
@@ -49,7 +49,7 @@ function De(e, t) {
       return s;
   return null;
 }
-const _ = typeof globalThis < "u" ? globalThis : typeof self < "u" ? self : typeof window < "u" ? window : global, Be = (e) => !q(e) && e !== _;
+const L = typeof globalThis < "u" ? globalThis : typeof self < "u" ? self : typeof window < "u" ? window : global, Be = (e) => !q(e) && e !== L;
 function ne() {
   const { caseless: e } = Be(this) && this || {}, t = {}, n = (r, s) => {
     const o = e && De(t, s) || s;
@@ -83,7 +83,7 @@ const wt = (e, t, n, { allOwnKeys: r } = {}) => (H(t, (s, o) => {
   if (!e) return null;
   if (U(e)) return e;
   let t = e.length;
-  if (!_e(t)) return null;
+  if (!Le(t)) return null;
   const n = new Array(t);
   for (; t-- > 0; )
     n[t] = e[t];
@@ -134,8 +134,8 @@ const wt = (e, t, n, { allOwnKeys: r } = {}) => (H(t, (s, o) => {
     });
   };
   return U(e) ? r(e) : r(String(e).split(t)), n;
-}, Lt = () => {
-}, _t = (e, t) => e != null && Number.isFinite(e = +e) ? e : t, Z = "abcdefghijklmnopqrstuvwxyz", we = "0123456789", ke = {
+}, _t = () => {
+}, Lt = (e, t) => e != null && Number.isFinite(e = +e) ? e : t, Z = "abcdefghijklmnopqrstuvwxyz", we = "0123456789", ke = {
   DIGIT: we,
   ALPHA: Z,
   ALPHA_DIGIT: Z + Z.toUpperCase() + we
@@ -166,21 +166,21 @@ const Ut = (e) => {
     return r;
   };
   return n(e, 0);
-}, kt = C("AsyncFunction"), jt = (e) => e && (K(e) || T(e)) && T(e.then) && T(e.catch), je = ((e, t) => e ? setImmediate : t ? ((n, r) => (_.addEventListener("message", ({ source: s, data: o }) => {
-  s === _ && o === n && r.length && r.shift()();
+}, kt = C("AsyncFunction"), jt = (e) => e && (K(e) || T(e)) && T(e.then) && T(e.catch), je = ((e, t) => e ? setImmediate : t ? ((n, r) => (L.addEventListener("message", ({ source: s, data: o }) => {
+  s === L && o === n && r.length && r.shift()();
 }, !1), (s) => {
-  r.push(s), _.postMessage(n, "*");
+  r.push(s), L.postMessage(n, "*");
 }))(`axios@${Math.random()}`, []) : (n) => setTimeout(n))(
   typeof setImmediate == "function",
-  T(_.postMessage)
-), qt = typeof queueMicrotask < "u" ? queueMicrotask.bind(_) : typeof process < "u" && process.nextTick || je, a = {
+  T(L.postMessage)
+), qt = typeof queueMicrotask < "u" ? queueMicrotask.bind(L) : typeof process < "u" && process.nextTick || je, a = {
   isArray: U,
-  isArrayBuffer: Le,
+  isArrayBuffer: _e,
   isBuffer: tt,
   isFormData: lt,
   isArrayBufferView: nt,
   isString: rt,
-  isNumber: _e,
+  isNumber: Le,
   isBoolean: st,
   isObject: K,
   isPlainObject: z,
@@ -219,10 +219,10 @@ const Ut = (e) => {
   freezeMethods: Pt,
   toObjectSet: Ft,
   toCamelCase: Ct,
-  noop: Lt,
-  toFiniteNumber: _t,
+  noop: _t,
+  toFiniteNumber: Lt,
   findKey: De,
-  global: _,
+  global: L,
   isContextDefined: Be,
   ALPHABET: ke,
   generateString: Dt,
@@ -1041,7 +1041,7 @@ const Ke = (e) => {
         return;
       const w = g.from(
         "getAllResponseHeaders" in d && d.getAllResponseHeaders()
-      ), L = {
+      ), _ = {
         data: !c || c === "text" || c === "json" ? d.responseText : d.response,
         status: d.status,
         statusText: d.statusText,
@@ -1053,7 +1053,7 @@ const Ke = (e) => {
         n(P), y();
       }, function(P) {
         r(P), y();
-      }, L), d = null;
+      }, _), d = null;
     }
     "onloadend" in d ? d.onloadend = S : d.onreadystatechange = function() {
       !d || d.readyState !== 4 || d.status === 0 && !(d.responseURL && d.responseURL.indexOf("file:") === 0) || setTimeout(S);
@@ -1063,15 +1063,15 @@ const Ke = (e) => {
       r(new m("Network Error", m.ERR_NETWORK, e, d)), d = null;
     }, d.ontimeout = function() {
       let A = s.timeout ? "timeout of " + s.timeout + "ms exceeded" : "timeout exceeded";
-      const L = s.transitional || Je;
+      const _ = s.transitional || Je;
       s.timeoutErrorMessage && (A = s.timeoutErrorMessage), r(new m(
         A,
-        L.clarifyTimeoutError ? m.ETIMEDOUT : m.ECONNABORTED,
+        _.clarifyTimeoutError ? m.ETIMEDOUT : m.ECONNABORTED,
         e,
         d
       )), d = null;
-    }, o === void 0 && i.setContentType(null), "setRequestHeader" in d && a.forEach(i.toJSON(), function(A, L) {
-      d.setRequestHeader(L, A);
+    }, o === void 0 && i.setContentType(null), "setRequestHeader" in d && a.forEach(i.toJSON(), function(A, _) {
+      d.setRequestHeader(_, A);
     }), a.isUndefined(s.withCredentials) || (d.withCredentials = !!s.withCredentials), c && c !== "json" && (d.responseType = s.responseType), u && ([b, h] = V(u, !0), d.addEventListener("progress", b)), f && d.upload && ([p, E] = V(f), d.upload.addEventListener("progress", p), d.upload.addEventListener("loadend", E)), (s.cancelToken || s.signal) && (l = (w) => {
       d && (r(!w || w.type ? new k(null, e, d) : w), d.abort(), d = null);
     }, s.cancelToken && s.cancelToken.subscribe(l), s.signal && (s.signal.aborted ? l() : s.signal.addEventListener("abort", l)));
@@ -1251,10 +1251,10 @@ const Sn = async (e) => {
       );
     }
     u = u || "text";
-    let L = await $[a.findKey($, u) || "text"](w, e);
+    let _ = await $[a.findKey($, u) || "text"](w, e);
     return !A && S(), h && h(), await new Promise((N, P) => {
       ve(N, P, {
-        data: L,
+        data: _,
         headers: g.from(w.headers),
         status: w.status,
         statusText: w.statusText,
@@ -1685,12 +1685,11 @@ const Pn = (e) => {
             ...r
           }
         }, l = R.create({
-          baseURL: n,
           headers: {
             ...u.headers
           }
         });
-        return window.streamlineAxios = l, l.post("/", {
+        return window.streamlineAxios = l, l.post(n, {
           action: i,
           stream: e,
           ...t,
