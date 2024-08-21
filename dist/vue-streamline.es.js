@@ -1709,6 +1709,6 @@ const Pn = (e) => {
   }
 };
 export {
-  Fn as streamLine,
+  Fn as streamline,
   Pn as useStreamline
 };
