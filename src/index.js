@@ -1,6 +1,6 @@
 import useStreamline from './composables/useStreamline.js'
-import streamLine from './plugins/streamLine.js'
+import streamline from './plugins/streamline.js'
 export {
     useStreamline,
-    streamLine
+    streamline
 }
