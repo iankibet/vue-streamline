@@ -40,3 +40,11 @@ tasksServices.getTasks().then(response => {
     console.log(response)
 })
 ```
+
+
+## Getting url to an action/method in the service
+
+You can get the url to an action/method in the service by calling the getActionUrl method on the service object passing the action name and any parameters
+```js
+ tasksService.getActionUrl('getTasks', {page: 1})
+ ```
