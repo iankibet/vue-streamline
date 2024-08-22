@@ -1,7 +1,8 @@
 <script setup>
 import useStreamline from './composables/useStreamline.js'
 
-const {service:paybillService} = useStreamline('mpesa/paybill')
+const {loading, service:paybillService} = useStreamline('mpesa/paybill',28)
+
 
 const tryDelete = (id)=>{
   paybillService.deletePaybill(id).then(res=>{
@@ -16,9 +17,10 @@ const tryDelete = (id)=>{
 
 <template>
   <div>
+    {{ paybillService.paybill }}
     <h1 @click="tryDelete(1)">Streamline Framework</h1>
     {{ paybillService.getActionUrl('addPaybill') }}
-
+<h3 class="text-success" v-if="loading">Loading...</h3>
   </div>
 </template>
 
