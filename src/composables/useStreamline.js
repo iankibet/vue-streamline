@@ -3,7 +3,7 @@ import { inject, reactive, ref, toRefs } from 'vue'
 
 const useStreamline = (stream, ...initialArgs) => {
     let formData = {}
-    const loading = ref(false) // Create a reactive object to hold the loading state
+    const loading = ref(false)
 
     // Inject headers and apiEndpoint
     const streamlineUrl = inject('streamlineUrl')
@@ -17,7 +17,7 @@ const useStreamline = (stream, ...initialArgs) => {
 
     const service = reactive({}) // Make the service object reactive
 
-    // Fetch the public properties of the service class
+    // Function to fetch the public properties of the service class
     const fetchServiceProperties = async () => {
         try {
             loading.value = true
@@ -26,12 +26,34 @@ const useStreamline = (stream, ...initialArgs) => {
                 stream,
                 params: initialArgs
             })
-            Object.assign(service, response.data) // Assign the properties to the reactive service object
-            loading.value = false
+            assignPropertiesAndMethods(response.data)
         } catch (error) {
             console.error(`Error fetching properties for stream ${stream}`, error)
-            loading.value = false
             throw error
+        } finally {
+            loading.value = false
+        }
+    }
+
+    // Function to assign properties and methods to the service object
+    const assignPropertiesAndMethods = (data) => {
+        Object.assign(service, data.properties) // Assign the properties to the reactive service object
+        const methods = data.methods
+        for (const method of methods) {
+            service[method] = async (...args) => {
+                try {
+                    const response = await axios.post(streamlineUrl, {
+                        action: method,
+                        stream,
+                        ...formData,
+                        params: args
+                    })
+                    return response.data
+                } catch (error) {
+                    console.error(`Error calling ${method} on stream ${stream}`, error)
+                    throw error
+                }
+            }
         }
     }
 
@@ -46,6 +68,14 @@ const useStreamline = (stream, ...initialArgs) => {
                 if (setDataActions.includes(action)) {
                     formData = args[0]
                     return proxyService
+                }
+                const getMethodsActions = ['getMethods','getActions','getFunctions','getServiceMethods']
+                if(getMethodsActions.includes(action)) {
+                    return Object.keys(proxyService).filter(key=>{
+                        if(typeof proxyService[key] === 'function') {
+                            return key
+                        }
+                    })
                 }
 
                 const postBody = {
@@ -63,8 +93,12 @@ const useStreamline = (stream, ...initialArgs) => {
                     }
                     return streamlineUrl + '?' + new URLSearchParams(postBody).toString()
                 }
+
                 postBody.params = args
-                return axios.post(streamlineUrl, postBody)
+                return axios.post(streamlineUrl, postBody).then(response => response.data).catch(error => {
+                    console.error(`Error calling ${action} on stream ${stream}`, error)
+                    throw error
+                })
             }
         }
     })
