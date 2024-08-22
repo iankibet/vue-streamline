@@ -1,8 +1,9 @@
 import Axios from 'axios'
-import { inject, reactive, ref, toRefs } from 'vue'
+import { inject, onMounted, reactive, ref, toRefs } from 'vue'
 
 const useStreamline = (stream, ...initialArgs) => {
     let formData = {}
+    const isInitialized = ref(false)
     const loading = ref(false)
 
     // Inject headers and apiEndpoint
@@ -15,7 +16,9 @@ const useStreamline = (stream, ...initialArgs) => {
         }
     })
 
-    const service = reactive({}) // Make the service object reactive
+    const service = reactive({
+        initialized: false
+    }) // Make the service object reactive
 
     // Function to fetch the public properties of the service class
     const fetchServiceProperties = async () => {
@@ -27,11 +30,20 @@ const useStreamline = (stream, ...initialArgs) => {
                 params: initialArgs
             })
             assignPropertiesAndMethods(response.data)
+            loading.value = false
+            setTimeout(() => {
+                service.initialized = true
+                loading.value = false
+            },300)
         } catch (error) {
             console.error(`Error fetching properties for stream ${stream}`, error)
             throw error
         } finally {
             loading.value = false
+            setTimeout(() => {
+                service.initialized = true
+                loading.value = false
+            },300)
         }
     }
 
@@ -64,6 +76,10 @@ const useStreamline = (stream, ...initialArgs) => {
             }
 
             return (...args) => {
+                if(action === 'initialize'){
+                    fetchServiceProperties()
+                    return
+                }
                 const setDataActions = ['setFormData', 'setData']
                 if (setDataActions.includes(action)) {
                     formData = args[0]
@@ -104,7 +120,14 @@ const useStreamline = (stream, ...initialArgs) => {
     })
 
     // Fetch and set the properties on initialization
-    fetchServiceProperties()
+
+    onMounted(() => {
+        loading.value = true
+        setTimeout(() => {
+            proxyService.initialize()
+        },1)
+    })
+
 
     return {
         ...toRefs(service), // Spread the reactive service properties and return as refs for reactivity

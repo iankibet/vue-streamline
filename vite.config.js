@@ -9,6 +9,7 @@ export default defineConfig({
       entry: './src/index.js',
       name: 'VueStreamline',
       fileName: (format) => `vue-streamline.${format}.js`,
+      formats: ['es', 'cjs'],
     },
     rollupOptions: {
       // Make sure to externalize deps that shouldn't be bundled into your library

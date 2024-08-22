@@ -4,6 +4,7 @@ import { ref } from 'vue'
 
 const {loading, service:paybillService} = useStreamline('mpesa/paybill',28)
 
+const {paybill} = paybillService
 
 const foundPaybill = ref(null)
 
