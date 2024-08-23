@@ -32,7 +32,7 @@ Vue.use(streamline, {
 import { useStreamline } from '@iankibet/vue-streamline'
 
 
-const {service:tasksService} = useStreamline('tasks')
+const {getActionUrl, service:tasksService} = useStreamline('tasks')
 
 // call the service methods
 
@@ -46,5 +46,5 @@ tasksServices.getTasks().then(response => {
 
 You can get the url to an action/method in the service by calling the getActionUrl method on the service object passing the action name and any parameters
 ```js
- tasksService.getActionUrl('getTasks', 'active')
+getActionUrl('getTasks', 'active')
  ```
