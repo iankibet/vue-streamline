@@ -1,5 +1,5 @@
 import Axios from 'axios'
-import { inject, reactive, ref, toRefs } from 'vue'
+import { inject, onMounted, reactive, ref, toRefs } from 'vue'
 
 const useStreamline = (stream, ...initialArgs) => {
     let formData = {}
@@ -72,7 +72,9 @@ const useStreamline = (stream, ...initialArgs) => {
         return streamlineUrl + '?' + new URLSearchParams(post).toString()
 
     }
-    fetchServiceProperties()
+    onMounted(()=>{
+        fetchServiceProperties()
+    })
 
     return {
         loading,
