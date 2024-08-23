@@ -1,5 +1,5 @@
 import Axios from 'axios'
-import { inject, reactive, ref, toRefs } from 'vue'
+import { inject, onMounted, reactive, ref, toRefs } from 'vue'
 
 const useStreamline = (stream, ...initialArgs) => {
     let formData = {}
@@ -35,12 +35,13 @@ const useStreamline = (stream, ...initialArgs) => {
         }
     }
 
+
     // Function to assign properties and methods to the service object
     const assignPropertiesAndMethods = (data) => {
         Object.assign(service, data.properties) // Assign the properties to the reactive service object
-        const methods = data.methods
-        for (const method of methods) {
-            service[method] = async (...args) => {
+        for (const method of data.methods) {
+            const fn = async (...args) => {
+                loading.value = true
                 try {
                     const response = await axios.post(streamlineUrl, {
                         action: method,
@@ -52,64 +53,33 @@ const useStreamline = (stream, ...initialArgs) => {
                 } catch (error) {
                     console.error(`Error calling ${method} on stream ${stream}`, error)
                     throw error
+                } finally {
+                    loading.value = false
                 }
             }
+            service[method] = fn
         }
     }
 
-    const proxyService = new Proxy(service, {
-        get(target, action) {
-            if (action in target) {
-                return target[action] // Return the reactive property if it exists
-            }
+    const getActionUrl = (action, ...args) => {
+       // console log all arguments to this
 
-            return (...args) => {
-                const setDataActions = ['setFormData', 'setData']
-                if (setDataActions.includes(action)) {
-                    formData = args[0]
-                    return proxyService
-                }
-                const getMethodsActions = ['getMethods','getActions','getFunctions','getServiceMethods']
-                if(getMethodsActions.includes(action)) {
-                    return Object.keys(proxyService).filter(key=>{
-                        if(typeof proxyService[key] === 'function') {
-                            return key
-                        }
-                    })
-                }
-
-                const postBody = {
-                    action,
-                    stream,
-                    ...formData,
-                }
-
-                const getUrlMethods = ['getUrl', 'getFullUrl', 'getActionUrl']
-                if (getUrlMethods.includes(action)) {
-                    postBody.action = args[0]
-                    const params = args.slice(1)
-                    if (params.length > 0) {
-                        postBody.params = params
-                    }
-                    return streamlineUrl + '?' + new URLSearchParams(postBody).toString()
-                }
-
-                postBody.params = args
-                return axios.post(streamlineUrl, postBody).then(response => response.data).catch(error => {
-                    console.error(`Error calling ${action} on stream ${stream}`, error)
-                    throw error
-                })
-            }
+        const post = {
+            action,
+            stream,
+            params: args
         }
+        return streamlineUrl + '?' + new URLSearchParams(post).toString()
+
+    }
+    onMounted(()=>{
+        fetchServiceProperties()
     })
 
-    // Fetch and set the properties on initialization
-    fetchServiceProperties()
-
     return {
-        ...toRefs(service), // Spread the reactive service properties and return as refs for reactivity
-        service: proxyService, // Return the proxy service for method calls
-        loading
+        loading,
+        service,
+        getActionUrl
     }
 }
 

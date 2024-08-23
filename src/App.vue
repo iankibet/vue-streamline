@@ -1,26 +1,25 @@
 <script setup>
 import useStreamline from './composables/useStreamline.js'
-import { ref } from 'vue'
+import { ref, toRefs } from 'vue'
 
-const {loading, service:paybillService} = useStreamline('mpesa/paybill',28)
+const {loading, service:paybillService, getActionUrl} = useStreamline('mpesa/paybill',3)
 
 
 const foundPaybill = ref(null)
 
+
 const findPaybill = async ()=>{
-  foundPaybill.value = await paybillService.getPaybill(28)
+  foundPaybill.value = await paybillService.getPaybill(3)
+  console.log(getActionUrl('getPaybill',3))
 }
 </script>
 
 <template>
   <div>
-    {{ paybillService.getMethods() }}
-    <input type="text">
-    {{ paybillService.paybill }}
-    <h1 @click="findPaybill(28)">Try Find</h1>
-    {{ paybillService.getActionUrl('addPaybill') }}
-<h3 class="text-success" v-if="loading">Loading...</h3>
-    {{ foundPaybill }}
+    {{ paybill }}
+    <hr/>
+    <h3 class="text-success" >Loading : {{ loading }}</h3>
+    <h1 @click="findPaybill">Get Paybill</h1>
   </div>
 </template>
 
