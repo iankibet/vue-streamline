@@ -14,8 +14,33 @@ const useStreamline = (stream, ...initialArgs) => {
             ...streamlineHeaders
         }
     })
+    const handler = {
+        get(target, prop, receiver) {
+            if (prop in target) {
+                return target[prop]
+            }
+            return async (...args) => {
+                loading.value = true
+                try {
+                    const response = await axios.post(streamlineUrl, {
+                        action: prop,
+                        stream,
+                        ...formData,
+                        params: args
+                    })
+                    return response.data
+                } catch (error) {
+                    console.error(`Error calling ${prop} on stream ${stream}`, error)
+                    throw error
+                } finally {
+                    loading.value = false
+                }
+            }
+        }
+    }
 
-    const service = reactive({}) // Make the service object reactive
+    const service = reactive({
+    }) // Make the service object reactive
 
     // Function to fetch the public properties of the service class
     const fetchServiceProperties = async () => {
@@ -78,7 +103,7 @@ const useStreamline = (stream, ...initialArgs) => {
 
     return {
         loading,
-        service,
+        service: new Proxy(service, handler),
         getActionUrl
     }
 }
