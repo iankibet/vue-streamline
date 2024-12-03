@@ -11,7 +11,7 @@ const app = createApp(App)
 app.use(streamline,{
     streamlineHeaders,
     streamlineUrl,
-    enableCache: false
+    enableCache: true
 })
 
 app.mount('#app')

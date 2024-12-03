@@ -114,13 +114,13 @@ const useStreamline = (stream, ...initialArgs) => {
     const service = reactive({}); // Make the service object reactive
 
     onMounted(() => {
-        if (initialArgs.length > 0) {
-            fetchServiceProperties();
-        }
         if (!enableCache) return;
         const cachedData = localStorage.getItem(cacheKey);
         if (cachedData) {
             assignPropertiesAndMethods(JSON.parse(cachedData));
+        }
+        if (initialArgs.length > 0) {
+            fetchServiceProperties();
         }
 
     });
