@@ -2,19 +2,19 @@
 import useStreamline from './composables/useStreamline.js'
 import { onMounted, ref, toRefs } from 'vue'
 
-const {loading, service:paybillService, getActionUrl} = useStreamline('mpesa/paybill',3)
+const {loading, service:paybillService, getActionUrl} = useStreamline('mpesa/paybill',32)
 
 
 const foundPaybill = ref(null)
 
 onMounted(()=>{
-  paybillService.callAnyMethod(3).then(res=>{
-    foundPaybill.value = res
-  })
+  // paybillService.getPaybill(32).then(res=>{
+  //   foundPaybill.value = res
+  // })
 })
 const findPaybill = async ()=>{
-  foundPaybill.value = await paybillService.getPaybill(3)
-  console.log(getActionUrl('getPaybill',3))
+  foundPaybill.value = await paybillService.getPaybill(32)
+  console.log(getActionUrl('getPaybill',32))
 }
 </script>
 
@@ -22,7 +22,9 @@ const findPaybill = async ()=>{
   <div>
     <hr/>
     <h3 class="text-success" >Loading : {{ loading }}</h3>
+    <h5>Found Paybill : {{ paybillService.paybill }}</h5>
     <h1 @click="findPaybill">Get Paybill</h1>
+    {{ foundPaybill }}
   </div>
 </template>
 

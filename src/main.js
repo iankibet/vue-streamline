@@ -10,7 +10,8 @@ const streamlineUrl = 'http://2022-sharasms.test/api/streamline'
 const app = createApp(App)
 app.use(streamline,{
     streamlineHeaders,
-    streamlineUrl
+    streamlineUrl,
+    enableCache: false
 })
 
 app.mount('#app')
