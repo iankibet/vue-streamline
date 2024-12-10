@@ -102,7 +102,7 @@ const useStreamline = (stream, ...initialArgs) => {
     };
 
     const getActionUrl = (action, ...args) => {
-        console.log('getActionUrl called with:', action, args);
+        // console.log('getActionUrl called with:', action, args);
         const post = {
             action,
             stream,
