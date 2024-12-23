@@ -32,11 +32,19 @@ Vue.use(streamline, {
 import { useStreamline } from '@iankibet/vue-streamline'
 
 
-const {getActionUrl, service:tasksService} = useStreamline('tasks')
+const {getActionUrl, service:tasksService, props} = useStreamline('tasks')
 
-// call the service methods
+```
 
-tasksServices.getTasks().then(response => {
+## Calling an action/method in the service
+
+You can call an action/method in the service by calling the method on the service object
+```js
+const res = await tasksService.getTasks()
+
+// or
+
+tasksService.getTasks().then(response => {
     console.log(response)
 })
 ```
@@ -48,3 +56,13 @@ You can get the url to an action/method in the service by calling the getActionU
 ```js
 getActionUrl('getTasks', 'active')
  ```
+
+## Accessing class properties
+In your template just access the props object to get the class properties
+```html
+<template>
+    <div>
+        <h1>{{props.title}}</h1>
+    </div>
+</template>
+```
