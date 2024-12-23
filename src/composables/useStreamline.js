@@ -14,6 +14,20 @@ const useStreamline = (stream, ...initialArgs) => {
     const streamlineHeaders = inject('streamlineHeaders');
     const enableCache = inject('enableCache');
 
+    const originalProps = reactive({});
+
+// Proxy to intercept access
+    const props = new Proxy(originalProps, {
+        get(target, property, receiver) {
+            if(!propertiesFetched.value) {
+                fetchServiceProperties().then(() => target[property]);
+            }
+            return Reflect.get(target, property, receiver); // Return the actual value
+        },
+        set(target, property, value, receiver) {
+            return Reflect.set(target, property, value, receiver); // Update the value
+        }
+    })
     const axios = Axios.create({
         headers: {
             ...streamlineHeaders,
@@ -31,7 +45,7 @@ const useStreamline = (stream, ...initialArgs) => {
                 stream,
                 params: initialArgs,
             });
-            assignPropertiesAndMethods(response.data);
+            assignProperties(response.data);
             enableCache && localStorage.setItem(cacheKey, JSON.stringify(response.data));
         } catch (error) {
             console.error(`Error fetching properties for stream ${stream}`, error);
@@ -43,37 +57,13 @@ const useStreamline = (stream, ...initialArgs) => {
         }
     };
 
-    const assignPropertiesAndMethods = (data) => {
+    const assignProperties = (data) => {
         Object.assign(service, data.properties); // Assign the properties to the reactive service object
-        for (const method of data.methods) {
-            const fn = async (...args) => {
-                loading.value = true;
-                try {
-                    const response = await axios.post(streamlineUrl, {
-                        action: method,
-                        stream,
-                        ...formData,
-                        params: args,
-                    });
-                    return response.data;
-                } catch (error) {
-                    console.error(`Error calling ${method} on stream ${stream}`, error);
-                    throw error;
-                } finally {
-                    loading.value = false;
-                }
-            };
-            service[method] = fn;
-        }
+        Object.assign(originalProps, data.properties); // Assign the properties to the reactive service object
     };
 
     const handler = {
         get(target, prop, receiver) {
-            // Fetch properties if not already fetched
-            if (!propertiesFetched.value && !loading.value) {
-                fetchServiceProperties().then(() => target[prop]);
-            }
-
             // Handle existing properties
             if (prop in target) {
                 return target[prop];
@@ -117,7 +107,7 @@ const useStreamline = (stream, ...initialArgs) => {
         if (!enableCache) return;
         const cachedData = localStorage.getItem(cacheKey);
         if (cachedData) {
-            assignPropertiesAndMethods(JSON.parse(cachedData));
+            assignProperties(JSON.parse(cachedData));
         }
         if (initialArgs.length > 0) {
             fetchServiceProperties();
@@ -129,6 +119,7 @@ const useStreamline = (stream, ...initialArgs) => {
         loading,
         service: new Proxy(service, handler),
         getActionUrl,
+        props
     };
 };
 
