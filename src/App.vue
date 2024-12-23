@@ -22,7 +22,10 @@ const findPaybill = async ()=>{
   <div>
     <hr/>
     <h3>Destructed: {{ testKey }}</h3>
-    <h3>Original: {{ servi.testKey }}</h3>
+    <h3>Original: {{ props.testKey }}</h3>
+    <h3>Original: {{ props.testKey }}</h3>
+    <h3>Original: {{ props.testKey }}</h3>
+    <h3>Original: {{ props.testKey }}</h3>
     <h3 class="text-success" >Loading : {{ loading }}</h3>
     <h1 @click="findPaybill">Get Paybill</h1>
     {{ foundPaybill }}
