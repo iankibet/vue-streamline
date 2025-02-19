@@ -112,7 +112,15 @@ const useStreamline = (stream, ...initialArgs) => {
             }
         }
     }
-
+    const getActionUrl = (action, ...args) => {
+        // console.log('getActionUrl called with:', action, args);
+        const post = {
+            action,
+            stream,
+            params: args
+        }
+        return `${streamlineUrl}?${new URLSearchParams(post).toString()}`
+    }
     const service = reactive({})
 
     // Confirmation wrapper
@@ -135,6 +143,7 @@ const useStreamline = (stream, ...initialArgs) => {
     return {
         loading,
         service: new Proxy(service, handler),
+        getActionUrl,
         confirmAction,
         props
     }
