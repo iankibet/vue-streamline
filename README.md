@@ -48,6 +48,14 @@ tasksService.getTasks().then(response => {
     console.log(response)
 })
 ```
+A swal popup asking the user to confirm the action will be shown before the action is called
+
+## Pre Confirm Calling a action/method 
+
+You can pre confirm calling an action/method in the service by calling the method on the service object
+```js
+const res = await tasksService.confirm('Are you sure you want to delete this task?').deleteTask(1)
+```
 
 
 ## Getting url to an action/method in the service
