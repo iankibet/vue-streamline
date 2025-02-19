@@ -2,7 +2,7 @@
 import useStreamline from './composables/useStreamline.js'
 import { onMounted, ref, toRefs } from 'vue'
 
-const {loading, service:paybillService, getActionUrl,props} = useStreamline('mpesa/paybill')
+const {loading, service:paybillService, getActionUrl,props,confirmAction} = useStreamline('mpesa/paybill')
 
 
 const foundPaybill = ref(null)
@@ -13,8 +13,14 @@ onMounted(()=>{
   // })
 })
 const findPaybill = async ()=>{
-  foundPaybill.value = await paybillService.getPaybill(32)
-  console.log(getActionUrl('getPaybill',32))
+  // const res = confirmAction('Are you sure?')
+  // res.getPaybill(32).then(res=>{
+  //   foundPaybill.value = res
+  // })
+  foundPaybill.value =  await  paybillService.confirm().getPaybill(32)
+      .catch(err=>{
+    console.log(err)
+  })
 }
 </script>
 

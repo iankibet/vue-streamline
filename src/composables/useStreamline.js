@@ -1,12 +1,13 @@
 import { inject, onMounted, reactive, ref } from 'vue'
-import { shApis } from '@iankibetsh/shframework'
+import { shApis, shRepo } from '@iankibetsh/shframework'
 
 const useStreamline = (stream, ...initialArgs) => {
     let formData = {}
     const loading = ref(false)
     const propertiesFetched = ref(false)
-    const fetching = ref(false)
-    // cache key for local storage, include initialArgs in the key
+    const confirmationMessage = ref(null)
+
+    // Cache key for local storage, include initialArgs in the key
     const cacheKey = `streamline_${stream}_${initialArgs.join('_')}`
 
     // Inject headers and API endpoint
@@ -15,7 +16,7 @@ const useStreamline = (stream, ...initialArgs) => {
 
     const originalProps = reactive({})
 
-// Proxy to intercept access
+    // Proxy to intercept access
     const props = new Proxy(originalProps, {
         get(target, property, receiver) {
             if (!propertiesFetched.value) {
@@ -29,8 +30,7 @@ const useStreamline = (stream, ...initialArgs) => {
     })
 
     const fetchServiceProperties = async () => {
-        if (loading.value || fetching.value || propertiesFetched.value) return
-        fetching.value = true
+        if (loading.value || propertiesFetched.value) return
 
         try {
             loading.value = true
@@ -46,14 +46,13 @@ const useStreamline = (stream, ...initialArgs) => {
             throw error
         } finally {
             propertiesFetched.value = true
-            fetching.value = false
             loading.value = false
         }
     }
 
     const assignProperties = (data) => {
-        Object.assign(service, data.properties) // Assign the properties to the reactive service object
-        Object.assign(originalProps, data.properties) // Assign the properties to the reactive service object
+        Object.assign(service, data.properties)
+        Object.assign(originalProps, data.properties)
     }
 
     const handler = {
@@ -63,22 +62,46 @@ const useStreamline = (stream, ...initialArgs) => {
                 fetchServiceProperties().then(() => target[prop])
             }
 
-            // Handle existing properties
             if (prop in target) {
                 return target[prop]
             }
-            // Handle nonexistent properties or dynamic methods
+
             return (...args) => {
+                if(prop === 'confirm'){
+                    return confirmAction(args[0] ?? 'Are you sure?')
+                }
+                let repo = null
+                const data = {
+                    action: prop,
+                    stream,
+                    ...formData,
+                    params: args
+                }
+                if (confirmationMessage.value) {
+                  repo = shRepo.runPlainRequest(streamlineUrl,null, confirmationMessage.value,data)
+                } else {
+                    repo = shApis
+                        .doPost(streamlineUrl, data);
+                }
+
                 loading.value = true
-                return shApis
-                    .doPost(streamlineUrl, {
-                        action: prop,
-                        stream,
-                        ...formData,
-                        params: args
-                    })
-                    .then((response) => {
-                        loading.value = false
+                return repo.then((response) => {
+                    loading.value = false
+                    if(confirmationMessage.value){
+                        confirmationMessage.value = null
+
+                        if(!response.isConfirmed){
+                            return
+                        }
+                        if(response.value?.success){
+                            return response.value.response
+                        } else {
+                            // throw error
+                            throw response.value.error
+                        }
+
+                    }
+
                         return response.data
                     })
                     .catch((error) => {
@@ -90,17 +113,13 @@ const useStreamline = (stream, ...initialArgs) => {
         }
     }
 
-    const getActionUrl = (action, ...args) => {
-        // console.log('getActionUrl called with:', action, args);
-        const post = {
-            action,
-            stream,
-            params: args
-        }
-        return `${streamlineUrl}?${new URLSearchParams(post).toString()}`
-    }
+    const service = reactive({})
 
-    const service = reactive({}) // Make the service object reactive
+    // Confirmation wrapper
+    const confirmAction = (message) => {
+        confirmationMessage.value = message
+        return new Proxy(service, handler)
+    }
 
     onMounted(() => {
         if (!enableCache) return
@@ -111,13 +130,12 @@ const useStreamline = (stream, ...initialArgs) => {
         if (initialArgs.length > 0) {
             fetchServiceProperties()
         }
-
     })
 
     return {
         loading,
         service: new Proxy(service, handler),
-        getActionUrl,
+        confirmAction,
         props
     }
 }
