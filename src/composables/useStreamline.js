@@ -130,13 +130,13 @@ const useStreamline = (stream, ...initialArgs) => {
     }
 
     onMounted(() => {
+        if (initialArgs.length > 0) {
+            fetchServiceProperties()
+        }
         if (!enableCache) return
         const cachedData = localStorage.getItem(cacheKey)
         if (cachedData) {
             assignProperties(JSON.parse(cachedData))
-        }
-        if (initialArgs.length > 0) {
-            fetchServiceProperties()
         }
     })
 

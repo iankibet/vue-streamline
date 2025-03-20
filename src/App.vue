@@ -2,7 +2,7 @@
 import useStreamline from './composables/useStreamline.js'
 import { onMounted, ref, toRefs } from 'vue'
 
-const {loading, service:paybillService, getActionUrl,props,confirmAction} = useStreamline('mpesa/paybill')
+const {loading, service:paybillService, getActionUrl,props,confirmAction} = useStreamline('mpesa/paybill',true)
 
 
 const foundPaybill = ref(null)
@@ -27,14 +27,14 @@ const findPaybill = async ()=>{
 <template>
   <div>
     <hr/>
-    <h3>Destructed: {{ testKey }}</h3>
-    <h3>Original: {{ props.testKey }}</h3>
-    <h3>Original: {{ props.testKey }}</h3>
-    <h3>Original: {{ props.testKey }}</h3>
-    <h3>Original: {{ props.testKey }}</h3>
-    <h3 class="text-success" >Loading : {{ loading }}</h3>
-    <h1 @click="findPaybill">Get Paybill</h1>
-    {{ foundPaybill }}
+<!--    <h3>Destructed: {{ testKey }}</h3>-->
+<!--    <h3>Original: {{ props.testKey }}</h3>-->
+<!--    <h3>Original: {{ props.testKey }}</h3>-->
+<!--    <h3>Original: {{ props.testKey }}</h3>-->
+<!--    <h3>Original: {{ props.testKey }}</h3>-->
+<!--    <h3 class="text-success" >Loading : {{ loading }}</h3>-->
+<!--    <h1 @click="findPaybill">Get Paybill</h1>-->
+<!--    {{ foundPaybill }}-->
   </div>
 </template>
 
