@@ -66,7 +66,22 @@ getActionUrl('getTasks', 'active')
  ```
 
 ## Accessing class properties
-In your template just access the props object to get the class properties
+You can access the class properties defined in the service class using the props object returned by the useStreamline function
+### In your script
+Access the props object to get the class properties, use computed to make it reactive
+```js
+const title = computed(() => props.title)
+```
+Then use it in your template
+```html
+<template>
+    <div>
+        <h1>{{title}}</h1>
+    </div>
+</template>
+```
+### Directly in your template
+In your template just access the props object to get the class properties. Prefer using computed to make it reactive
 ```html
 <template>
     <div>
