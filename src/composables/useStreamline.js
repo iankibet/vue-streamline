@@ -57,11 +57,6 @@ const useStreamline = (stream, ...initialArgs) => {
 
     const handler = {
         get(target, prop, receiver) {
-            // Fetch properties if not already fetched
-            if (!propertiesFetched.value && !loading.value) {
-                fetchServiceProperties().then(() => target[prop])
-            }
-
             if (prop in target) {
                 return target[prop]
             }
