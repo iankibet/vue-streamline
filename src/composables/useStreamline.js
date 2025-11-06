@@ -108,14 +108,23 @@ const useStreamline = (stream, ...initialArgs) => {
         }
     }
     const getActionUrl = (action, ...args) => {
-        // console.log('getActionUrl called with:', action, args);
-        const post = {
-            action,
-            stream,
-            params: args
+        let newStream = stream
+        if(action.includes(':')){
+            [newStream, action] = action.split(':')
         }
-        return `${streamlineUrl}?${new URLSearchParams(post).toString()}`
+        const params = new URLSearchParams({
+            action,
+            stream: newStream
+        })
+
+        // Add each arg as a separate param
+        args.forEach((arg, index) => {
+            params.append(`params[${index}]`, typeof arg === 'object' ? JSON.stringify(arg) : arg)
+        })
+
+        return `${streamlineUrl}?${params.toString()}`
     }
+
     const service = reactive({})
 
     // Confirmation wrapper
