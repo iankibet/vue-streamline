@@ -112,17 +112,25 @@ const useStreamline = (stream, ...initialArgs) => {
         if(action.includes(':')){
             [newStream, action] = action.split(':')
         }
-        const params = new URLSearchParams({
+        const post = {
             action,
-            stream: newStream
-        })
+            stream:newStream,
+            params: args
+        }
+        return `${streamlineUrl}?${new URLSearchParams(post).toString()}`
 
-        // Add each arg as a separate param
-        args.forEach((arg, index) => {
-            params.append(`params[${index}]`, typeof arg === 'object' ? JSON.stringify(arg) : arg)
-        })
+        // // Add each arg as a separate param
+        // args.forEach((arg, index) => {
+        //     let value = arg;
+        //     if (typeof arg === 'object' && !(arg instanceof Date)) {
+        //         value = JSON.stringify(arg);
+        //     } else if (arg instanceof Date) {
+        //         value = arg.toISOString();
+        //     }
+        //     params.append(`params[${index}]`, value);
+        // })
 
-        return `${streamlineUrl}?${params.toString()}`
+        // return `${streamlineUrl}?${params.toString()}`
     }
 
     const service = reactive({})
