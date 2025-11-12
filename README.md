@@ -1,11 +1,11 @@
 # Streamline Vue Plugin
 
-A powerful Vue 3 plugin for seamless integration with Streamline backend services, providing reactive state management, caching, and dynamic action calling.
+A robust Vue 3 plugin designed for seamless integration with Streamline backend services. It delivers reactive state management, intelligent caching, and dynamic action invocation.
 
 ## Installation
 
 ```bash
-npm install @iankibetsh/streamline
+npm install @iankibetsh/vue-streamline
 ```
 
 ## Setup
@@ -13,27 +13,36 @@ npm install @iankibetsh/streamline
 ### 1. Register the Plugin
 
 ```javascript
-import { createApp } from 'vue'
-import streamlinePlugin from './plugins/streamline'
-import App from './App.vue'
+import { createApp } from 'vue';
+import { streamline } from '@iankibetsh/vue-streamline';
+import App from './App.vue';
 
-const app = createApp(App)
+const app = createApp(App);
 
-app.use(streamlinePlugin, {
-  streamlineUrl: 'https://your-api.com/streamline',
-  enableCache: true // Optional: Enable local storage caching
-})
+// Define authentication headers
+const streamlineHeaders = {
+  Authorization: `Bearer ${localStorage.getItem('access_token')}`
+};
 
-app.mount('#app')
+// Construct the Streamline endpoint URL
+const streamlineUrl = `${import.meta.env.VITE_APP_API_URL}streamline`;
+
+app.use(streamline, {
+  streamlineHeaders,
+  streamlineUrl,
+  enableCache: true // Optional: enables local storage caching
+});
+
+app.mount('#app');
 ```
 
 ### 2. Use in Components
 
 ```vue
 <script setup>
-import { useStreamline } from './composables/useStreamline'
+import { useStreamline } from '@iankibetsh/vue-streamline';
 
-const { service, loading, props, getActionUrl } = useStreamline('users', 1)
+const { service, loading, props, getActionUrl } = useStreamline('users', 1);
 </script>
 ```
 
@@ -41,22 +50,24 @@ const { service, loading, props, getActionUrl } = useStreamline('users', 1)
 
 ### `useStreamline(stream, ...initialArgs)`
 
-The main composable for interacting with Streamline services.
+Primary composable for interfacing with Streamline services.
 
 #### Parameters
 
-- **`stream`** (String): The name of the stream/service to connect to
-- **`...initialArgs`** (Any): Optional initial arguments passed to the stream's `onMounted` action
+- **`stream`** (`string`): Name of the target stream or service.
+- **`...initialArgs`** (`any`): Optional arguments passed to the stream’s `onMounted` action.
 
 #### Returns
 
-An object containing:
+An object with the following reactive properties and utilities:
 
-- **`service`**: A reactive proxy object for calling stream actions
-- **`loading`**: A reactive ref indicating loading state
-- **`props`**: A reactive proxy object containing properties fetched from the stream
-- **`getActionUrl`**: A function to generate URLs for stream actions
-- **`confirmAction`**: A function to show confirmation dialogs before executing actions
+| Property         | Type                  | Description |
+|------------------|-----------------------|-------------|
+| `service`        | Reactive Proxy        | Proxy for invoking stream actions dynamically. |
+| `loading`        | `ref<boolean>`        | Indicates ongoing operations. |
+| `props`          | Reactive Proxy        | Holds properties fetched from the stream. |
+| `getActionUrl`   | `Function`            | Generates URLs for specific actions. |
+| `confirmAction`  | `Function`            | Displays confirmation dialogs before actions. |
 
 ---
 
@@ -64,41 +75,41 @@ An object containing:
 
 ### 1. Dynamic Action Calling
 
-Call any backend action dynamically through the `service` proxy:
+Invoke backend actions via the `service` proxy:
 
 ```javascript
-const { service, loading } = useStreamline('users')
+const { service, loading } = useStreamline('users');
 
-// Call actions dynamically
-await service.fetchAll()
-await service.create({ name: 'John', email: 'john@example.com' })
-await service.update(1, { name: 'Jane' })
-await service.delete(5)
+// Standard CRUD operations
+await service.fetchAll();
+await service.create({ name: 'John', email: 'john@example.com' });
+await service.update(1, { name: 'Jane' });
+await service.delete(5);
 
-// Pass multiple arguments
-await service.customAction(arg1, arg2, arg3)
+// Custom actions with multiple arguments
+await service.customAction(arg1, arg2, arg3);
 ```
 
 ### 2. Reactive Properties
 
-Access stream properties that are automatically fetched on mount:
+Properties are fetched automatically upon component mount or first access:
 
 ```javascript
-const { props, loading } = useStreamline('dashboard', userId)
+const { props, loading } = useStreamline('dashboard', userId);
 
-// Access properties (will auto-fetch if not loaded)
-console.log(props.statistics)
-console.log(props.userInfo)
-console.log(props.settings)
+// Properties trigger fetch on access if not yet loaded
+console.log(props.statistics);
+console.log(props.userInfo);
+console.log(props.settings);
 ```
 
-Properties are fetched automatically when:
-- The component mounts (if `initialArgs` are provided)
-- You access any property on the `props` object
+**Auto-fetch triggers:**
+- Component `onMounted` (when `initialArgs` are provided)
+- First property access on the `props` proxy
 
 ### 3. Loading States
 
-Track loading state for all operations:
+Monitor operation status reactively:
 
 ```vue
 <template>
@@ -111,129 +122,123 @@ Track loading state for all operations:
 </template>
 
 <script setup>
-const { service, loading } = useStreamline('myStream')
+import { useStreamline } from '@iankibetsh/vue-streamline';
+
+const { service, loading } = useStreamline('data');
 </script>
 ```
 
 ### 4. Local Storage Caching
 
-Enable caching to store and retrieve properties from local storage:
+Enable persistent caching across sessions:
 
 ```javascript
-// In plugin setup
-app.use(streamlinePlugin, {
+app.use(streamline, {
   streamlineUrl: 'https://your-api.com/streamline',
   enableCache: true
-})
+});
 ```
 
-When enabled:
-- Properties are cached in local storage with a unique key
-- Cached data is loaded instantly on mount
-- Cache is updated after each successful fetch
-- Cache key includes stream name and initial arguments
+**Behavior when enabled:**
+- Data is stored in `localStorage` using a unique key (stream + arguments).
+- Cached data loads instantly on mount.
+- Cache updates after successful fetch operations.
+- Keys are deterministic and scoped per stream and arguments.
 
 ### 5. Manual Refresh
 
-Refresh stream properties manually:
+Force reload of stream properties:
 
 ```javascript
-const { service } = useStreamline('products', categoryId)
+const { service } = useStreamline('products', categoryId);
 
-// Force refresh properties
-await service.refresh()
-// or
-await service.reload()
+// Refresh properties
+await service.refresh(); // or service.reload()
 ```
 
 ### 6. Confirmation Dialogs
 
-Show confirmation dialogs before executing actions:
+Prompt users before destructive actions:
 
 ```javascript
-const { service } = useStreamline('users')
+const { service } = useStreamline('users');
 
-// Show confirmation with default message
-await service.confirm().delete(userId)
+// Default confirmation message
+await service.confirm().delete(userId);
 
-// Show confirmation with custom message
-await service.confirm('Are you sure you want to delete this user?').delete(userId)
+// Custom message
+await service.confirm('Are you sure you want to delete this user?').delete(userId);
 ```
 
-The confirmation uses `shRepo.runPlainRequest` from the SH Framework to display a native confirmation dialog.
+> Uses `shRepo.runPlainRequest` from the SH Framework for native confirmation dialogs.
 
 ### 7. Action URLs
 
-Generate URLs for stream actions (useful for links, downloads, or external integrations):
+Generate fully qualified action URLs:
 
 ```javascript
-const { getActionUrl } = useStreamline('reports')
+const { getActionUrl } = useStreamline('reports');
 
-// Generate URL for an action
-const downloadUrl = getActionUrl('download', reportId, 'pdf')
-// Result: https://your-api.com/streamline?action=download&stream=reports&params=reportId,pdf
+const downloadUrl = getActionUrl('download', reportId, 'pdf');
+// → https://your-api.com/streamline?action=download&stream=reports&params=reportId,pdf
 
-// Cross-stream actions using colon notation
-const otherStreamUrl = getActionUrl('otherStream:action', arg1, arg2)
-// This will call 'action' on 'otherStream' instead of the current stream
+// Cross-stream actions
+const analyticsUrl = getActionUrl('analytics:trackEvent', eventName, eventData);
 ```
 
 ### 8. Cross-Stream Actions
 
-Call actions on different streams using colon notation:
+Execute actions on different streams using colon notation:
 
 ```javascript
-const { service } = useStreamline('users')
+const { service } = useStreamline('users');
 
-// Call an action on a different stream
-await service['analytics:trackEvent'](eventName, eventData)
-// This calls 'trackEvent' on the 'analytics' stream
+await service['analytics:trackEvent'](eventName, eventData);
 ```
 
 ## Advanced Usage
 
-### Accessing Properties Immediately
+### Immediate Property Access
 
-Properties can be accessed before they're loaded - the fetch happens automatically:
+Access properties before loading — fetch triggers automatically:
 
 ```javascript
-const { props } = useStreamline('dashboard', userId)
+const { props } = useStreamline('dashboard', userId);
 
-// Access will trigger fetch if not already loaded
 watchEffect(() => {
-  console.log(props.stats) // Triggers fetchServiceProperties if needed
-})
+  console.log(props.stats); // Triggers fetch if needed
+});
 ```
 
-### Handling Errors
+### Error Handling
 
-All service calls return promises that can be caught:
+All action calls return promises:
 
 ```javascript
-const { service } = useStreamline('users')
+const { service } = useStreamline('users');
 
 try {
-  const result = await service.create(userData)
-  console.log('User created:', result)
+  const result = await service.create(userData);
+  console.log('User created:', result);
 } catch (error) {
-  console.error('Failed to create user:', error)
+  console.error('Creation failed:', error);
 }
 ```
 
 ### Form Data Integration
 
-Pass form data to actions:
+Pass structured data to actions:
 
 ```javascript
-const { service } = useStreamline('posts')
+const { service } = useStreamline('posts');
 
 const formData = {
   title: 'My Post',
   content: 'Post content',
   tags: ['vue', 'javascript']
-}
+};
 
-await service.create(formData)
+await service.create(formData);
 ```
 
 ## Complete Example
@@ -254,7 +259,7 @@ await service.create(formData)
           <button @click="editUser(user)">Edit</button>
           <button @click="deleteUser(user.id)">Delete</button>
           
-          <a :href="getActionUrl('exportUser', user.id)" target="_blank">
+          <a :href="getActionUrl('exportUser', user.id)" target="_blank" rel="noopener">
             Export Profile
           </a>
         </div>
@@ -267,130 +272,82 @@ await service.create(formData)
 </template>
 
 <script setup>
-import { useStreamline } from './composables/useStreamline'
+import { useStreamline } from '@iankibetsh/vue-streamline';
 
-const { service, loading, props, getActionUrl } = useStreamline('users', 'active')
+const { service, loading, props, getActionUrl } = useStreamline('users', 'active');
 
 const editUser = async (user) => {
   try {
     const result = await service.update(user.id, {
       name: user.name,
       email: user.email
-    })
-    console.log('User updated:', result)
+    });
+    console.log('User updated:', result);
   } catch (error) {
-    console.error('Update failed:', error)
+    console.error('Update failed:', error);
   }
-}
+};
 
 const deleteUser = async (userId) => {
   try {
-    await service.confirm('Delete this user permanently?').delete(userId)
-    await service.refresh() // Refresh the list
+    await service.confirm('Delete this user permanently?').delete(userId);
+    await service.refresh();
   } catch (error) {
-    console.error('Delete failed:', error)
+    console.error('Delete failed:', error);
   }
-}
+};
 
-const refreshData = () => {
-  service.refresh()
-}
+const refreshData = () => service.refresh();
 
 const addNewUser = async () => {
-  const newUser = {
-    name: 'New User',
-    email: 'newuser@example.com'
-  }
-  
-  await service.create(newUser)
-  await service.refresh()
-}
+  const newUser = { name: 'New User', email: 'newuser@example.com' };
+  await service.create(newUser);
+  await service.refresh();
+};
 </script>
-```
-
-## Backend Integration
-
-Your Streamline backend should respond to these actions:
-
-- **`onMounted`**: Called automatically when component mounts (if initialArgs provided)
-  - Should return: `{ properties: { /* your data */ } }`
-  
-- **Custom Actions**: Any action name you call on `service`
-  - Receives: `{ action, stream, params: [...args] }`
-  - Should return: `{ data: /* result */ }` or appropriate response
-
-Example backend response for `onMounted`:
-
-```json
-{
-  "properties": {
-    "users": [...],
-    "totalUsers": 150,
-    "statistics": {...},
-    "permissions": {...}
-  }
-}
-```
-
-## Configuration Options
-
-### Plugin Options
-
-```javascript
-app.use(streamlinePlugin, {
-  streamlineUrl: 'https://api.example.com/streamline', // Required
-  enableCache: true, // Optional, default: false
-  headers: { // Optional, custom headers
-    'Authorization': 'Bearer token',
-    'X-Custom-Header': 'value'
-  }
-})
 ```
 
 ## Best Practices
 
-1. **Use descriptive stream names** that match your backend services
-2. **Enable caching** for data that doesn't change frequently
-3. **Handle errors** appropriately in your components
-4. **Use loading states** to provide user feedback
-5. **Leverage confirmation dialogs** for destructive actions
-6. **Use `getActionUrl`** for downloadable resources or external links
-7. **Call `refresh()`** after mutations to update the UI
+1. **Use descriptive stream names** aligned with backend services.
+2. **Enable caching** for infrequently updated data.
+3. **Handle errors gracefully** in component logic.
+4. **Display loading states** for better user experience.
+5. **Use confirmation dialogs** for irreversible actions.
+6. **Leverage `getActionUrl`** for links and downloads.
+7. **Call `refresh()`** after mutations to synchronize UI.
 
-## About the `getActionUrl` Function
-
-The `getActionUrl` function generates properly formatted URLs for stream actions:
+## `getActionUrl` Function Details
 
 ```javascript
 const getActionUrl = (action, ...args) => {
-  // Supports cross-stream actions with colon notation
-  let newStream = stream
-  if(action.includes(':')){
-    [newStream, action] = action.split(':')
+  let targetStream = stream;
+  let targetAction = action;
+
+  if (action.includes(':')) {
+    [targetStream, targetAction] = action.split(':');
   }
-  
-  const post = {
-    action,
-    stream: newStream,
+
+  const payload = {
+    action: targetAction,
+    stream: targetStream,
     params: args
-  }
-  
-  return `${streamlineUrl}?${new URLSearchParams(post).toString()}`
-}
+  };
+
+  return `${streamlineUrl}?${new URLSearchParams(payload).toString()}`;
+};
 ```
 
-**Key Features:**
-- Generates GET URLs with query parameters
-- Supports cross-stream actions (e.g., `'otherStream:action'`)
-- Accepts multiple arguments that are serialized as params
-- Returns a fully qualified URL ready for use in links, downloads, or API calls
+**Key Capabilities:**
+- Serializes arguments into query parameters.
+- Supports cross-stream routing via `stream:action`.
+- Produces ready-to-use, fully qualified URLs.
 
 ## Dependencies
 
-- Vue 3 (reactive, ref, inject, onMounted)
-- @iankibetsh/shframework (shApis, shRepo)
+- **Vue 3**: `reactive`, `ref`, `inject`, `onMounted`
+- **@iankibetsh/shframework**: `shApis`, `shRepo`
 
 ## License
 
 MIT
-
