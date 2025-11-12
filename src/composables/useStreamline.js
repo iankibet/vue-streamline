@@ -29,8 +29,10 @@ const useStreamline = (stream, ...initialArgs) => {
         }
     })
 
-    const fetchServiceProperties = async () => {
-        if (loading.value || propertiesFetched.value) return
+    const fetchServiceProperties = async (force) => {
+        if(!force){
+            if (loading.value || propertiesFetched.value) return
+        }
 
         try {
             loading.value = true
@@ -62,6 +64,9 @@ const useStreamline = (stream, ...initialArgs) => {
             }
 
             return (...args) => {
+                if(prop === 'refresh' || prop === 'reload'){
+                    return fetchServiceProperties(true)
+                }
                 if(prop === 'confirm'){
                     return confirmAction(args[0] ?? 'Are you sure?')
                 }
