@@ -11,8 +11,8 @@ const useStreamline = (stream, ...initialArgs) => {
     const cacheKey = `streamline_${stream}_${initialArgs.join('_')}`
 
     // Inject headers and API endpoint
-    const streamlineUrl = inject('streamlineUrl','/api/streamline')
-    const enableCache = inject('enableCache',false)
+    const streamlineUrl = inject('streamlineUrl',window.streamlineUrl)
+    const enableCache = inject('enableCache',window.enableCache)
 
     const originalProps = reactive({})
 
