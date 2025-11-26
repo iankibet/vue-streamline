@@ -38,12 +38,32 @@ app.mount('#app');
 
 ### 2. Use in Components
 
+#### Option A: Full Streamline Integration
+
 ```vue
 <script setup>
 import { useStreamline } from '@iankibetsh/vue-streamline';
 
 const { service, loading, props, getActionUrl } = useStreamline('users', 1);
 </script>
+```
+
+#### Option B: Standalone `getActionUrl`
+
+If you only need to generate action URLs without the full reactive service:
+
+```vue
+<script setup>
+import { getActionUrl } from '@iankibetsh/vue-streamline';
+
+// Use directly in template or script
+const downloadUrl = getActionUrl('reports:download', reportId, 'pdf');
+</script>
+
+<template>
+  <a :href="getActionUrl('users:export', userId, 'csv')">Export User</a>
+  <h3>Action URL: {{ getActionUrl('users:listUsers', 'admin', 'active') }}</h3>
+</template>
 ```
 
 ## API Reference
@@ -68,6 +88,36 @@ An object with the following reactive properties and utilities:
 | `props`          | Reactive Proxy        | Holds properties fetched from the stream. |
 | `getActionUrl`   | `Function`            | Generates URLs for specific actions. |
 | `confirmAction`  | `Function`            | Displays confirmation dialogs before actions. |
+
+---
+
+### `getActionUrl(action, ...args)`
+
+Standalone function for generating action URLs without reactive features.
+
+#### Parameters
+
+- **`action`** (`string`): Action name, optionally prefixed with stream name (e.g., `'stream:action'`).
+- **`...args`** (`any`): Arguments to pass as URL parameters.
+
+#### Returns
+
+- **`string`**: Fully qualified URL for the specified action.
+
+#### Usage
+
+```javascript
+import { getActionUrl } from '@iankibetsh/vue-streamline';
+
+// Simple action URL
+const url = getActionUrl('download', fileId);
+
+// Cross-stream action
+const analyticsUrl = getActionUrl('analytics:track', eventName, userId);
+
+// Multiple parameters
+const reportUrl = getActionUrl('reports:generate', reportId, 'pdf', '2024');
+```
 
 ---
 
@@ -176,6 +226,8 @@ await service.confirm('Are you sure you want to delete this user?').delete(userI
 
 Generate fully qualified action URLs:
 
+#### Using `getActionUrl` from `useStreamline`
+
 ```javascript
 const { getActionUrl } = useStreamline('reports');
 
@@ -185,6 +237,38 @@ const downloadUrl = getActionUrl('download', reportId, 'pdf');
 // Cross-stream actions
 const analyticsUrl = getActionUrl('analytics:trackEvent', eventName, eventData);
 ```
+
+#### Using Standalone `getActionUrl`
+
+For scenarios where you only need URL generation without reactive state management:
+
+```vue
+<script setup>
+import { getActionUrl } from '@iankibetsh/vue-streamline';
+
+// Generate URLs directly
+const exportUrl = getActionUrl('users:export', userId, 'csv');
+const reportUrl = getActionUrl('reports:generate', reportId, 'pdf');
+</script>
+
+<template>
+  <!-- Use in templates -->
+  <a :href="getActionUrl('users:export', userId, 'csv')" download>
+    Export User
+  </a>
+  
+  <!-- Dynamic URLs -->
+  <div>
+    <h3>API Endpoint: {{ getActionUrl('users:listUsers', 'admin', 'active') }}</h3>
+  </div>
+</template>
+```
+
+**Benefits of Standalone Import:**
+- Lighter weight when you don't need reactive features
+- Can be used in utility files or non-component contexts
+- Still respects the global `streamlineUrl` configuration
+- Supports all the same features (cross-stream notation, multiple parameters)
 
 ### 8. Cross-Stream Actions
 

@@ -1,6 +1,7 @@
 <script setup>
 import useStreamline from './composables/useStreamline.js'
 import { onMounted, ref, toRefs } from 'vue'
+import SimpleGetActionUrl from './SimpleGetActionUrl.vue'
 
 const {loading, service:paybillService, getActionUrl,props,confirmAction} = useStreamline('mpesa/paybill',true)
 
@@ -40,6 +41,7 @@ const refresh = ()=>{
     <h1 @click="refresh">Refresh</h1>
     {{ foundPaybill }}
   </div>
+  <simple-get-action-url/>
 </template>
 
 <style scoped>
