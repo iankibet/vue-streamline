@@ -8,7 +8,7 @@ A robust Vue 3 plugin designed for seamless integration with Streamline backend 
 - **Stateful Streams**: Initial arguments are persisted across all subsequent action calls.
 - **Object Argument Mapping**: Pass objects that automatically populate backend `request()` data and map to method parameters.
 - **Reactive State**: Automatically syncs public properties from your backend Stream classes.
-- **Smart Caching**: Optional local storage caching for instant data availability.
+- **Smart Caching**: IndexedDB caching for instant data availability (enabled by default).
 - **Security & Privacy**: Automatically filters out internal methods and properties from the response payload.
 
 ## 📦 Installation
@@ -30,11 +30,14 @@ const app = createApp(App);
 
 app.use(streamline, {
   streamlineUrl: "https://your-api.com/api/streamline",
-  enableCache: true, // Optional
+  enableCache: true, // Enabled by default, set to false to disable
 });
 
 app.mount("#app");
 ```
+
+> [!NOTE]
+> Caching uses **IndexedDB** (`streamline_cache` database) for persistence, offering higher storage limits and better performance than standard local storage.
 
 ### 2. Use in Components
 
