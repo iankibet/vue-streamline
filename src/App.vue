@@ -3,7 +3,7 @@ import useStreamline from './composables/useStreamline.js'
 import { onMounted, ref, toRefs } from 'vue'
 import SimpleGetActionUrl from './SimpleGetActionUrl.vue'
 
-const {loading, service:paybillService, getActionUrl,props,confirmAction} = useStreamline('mpesa/paybill',true)
+const {loading, service:paybillService, getActionUrl,props,confirmAction} = useStreamline('mpesa/paybill',32)
 
 
 const foundPaybill = ref(null)
@@ -18,7 +18,7 @@ const findPaybill = async ()=>{
   // res.getPaybill(32).then(res=>{
   //   foundPaybill.value = res
   // })
-  foundPaybill.value =  await  paybillService.confirm().getPaybill(32)
+  foundPaybill.value =  await  paybillService.confirm().getPaybill(32, {name: 'ian'})
       .catch(err=>{
     console.log(err)
   })

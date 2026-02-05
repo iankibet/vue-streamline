@@ -75,8 +75,14 @@ const useStreamline = (stream, ...initialArgs) => {
                     action: prop,
                     stream,
                     ...formData,
-                    params: args
+                    params: args,
+                    initialParams: initialArgs
                 }
+                args.forEach(arg => {
+                    if (arg && typeof arg === 'object' && !Array.isArray(arg)) {
+                        Object.assign(data, arg)
+                    }
+                })
                 if (confirmationMessage.value) {
                   repo = shRepo.runPlainRequest(streamlineUrl,null, confirmationMessage.value,data)
                 } else {
