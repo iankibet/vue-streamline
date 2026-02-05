@@ -1,11 +1,11 @@
 <script setup>
 import useStreamline from './composables/useStreamline.js'
-import { onMounted, ref, toRefs } from 'vue'
+import { onMounted, ref, toRefs,computed } from 'vue'
 import SimpleGetActionUrl from './SimpleGetActionUrl.vue'
 
 const {loading, service:paybillService, getActionUrl,props,confirmAction} = useStreamline('mpesa/paybill',32)
 
-
+const existing = computed(()=>props.paybill)
 const foundPaybill = ref(null)
 
 onMounted(()=>{
@@ -40,6 +40,12 @@ const refresh = ()=>{
     <h1 @click="findPaybill">Get Paybill</h1>
     <h1 @click="refresh">Refresh</h1>
     {{ foundPaybill }}
+  </div>
+  <div class="alert alert-info">
+    <h2>Existing</h2>
+    <p>
+      {{  existing }}
+    </p>
   </div>
   <simple-get-action-url/>
 </template>

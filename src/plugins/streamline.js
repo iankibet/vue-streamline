@@ -2,11 +2,11 @@ const streamline = {
     install(app, options) {
         app.provide('streamlineUrl', options.streamlineUrl ?? '/api/streamline')
         // app.provide('streamlineHeaders', options.streamlineHeaders)
-        app.provide('enableCache', options.enableCache)
+        app.provide('enableCache', options.enableCache ?? true)
 
         // put them on window
         window.streamlineUrl = options.streamlineUrl ?? '/api/streamline'
-        window.enableCache = options.enableCache ?? false
+        window.enableCache = options.enableCache ?? true
     }
 }
 

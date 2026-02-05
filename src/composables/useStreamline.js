@@ -1,5 +1,6 @@
 import { inject, onMounted, reactive, ref } from 'vue'
 import { shApis, shRepo } from '@iankibetsh/shframework'
+import Cache from '../utils/cache'
 
 const useStreamline = (stream, ...initialArgs) => {
     let formData = {}
@@ -11,8 +12,8 @@ const useStreamline = (stream, ...initialArgs) => {
     const cacheKey = `streamline_${stream}_${initialArgs.join('_')}`
 
     // Inject headers and API endpoint
-    const streamlineUrl = inject('streamlineUrl',window.streamlineUrl)
-    const enableCache = inject('enableCache',window.enableCache)
+    const streamlineUrl = inject('streamlineUrl', window.streamlineUrl)
+    const enableCache = inject('enableCache', window.enableCache ?? true)
 
     const originalProps = reactive({})
 
@@ -30,7 +31,7 @@ const useStreamline = (stream, ...initialArgs) => {
     })
 
     const fetchServiceProperties = async (force) => {
-        if(!force){
+        if (!force) {
             if (loading.value || propertiesFetched.value) return
         }
 
@@ -42,7 +43,9 @@ const useStreamline = (stream, ...initialArgs) => {
                 params: initialArgs
             })
             assignProperties(response.data)
-            enableCache && localStorage.setItem(cacheKey, JSON.stringify(response.data))
+            if (enableCache) {
+                await Cache.set(cacheKey, response.data)
+            }
         } catch (error) {
             console.error(`Error fetching properties for stream ${stream}`, error)
             throw error
@@ -64,10 +67,10 @@ const useStreamline = (stream, ...initialArgs) => {
             }
 
             return (...args) => {
-                if(prop === 'refresh' || prop === 'reload'){
+                if (prop === 'refresh' || prop === 'reload') {
                     return fetchServiceProperties(true)
                 }
-                if(prop === 'confirm'){
+                if (prop === 'confirm') {
                     return confirmAction(args[0] ?? 'Are you sure?')
                 }
                 let repo = null
@@ -84,7 +87,7 @@ const useStreamline = (stream, ...initialArgs) => {
                     }
                 })
                 if (confirmationMessage.value) {
-                  repo = shRepo.runPlainRequest(streamlineUrl,null, confirmationMessage.value,data)
+                    repo = shRepo.runPlainRequest(streamlineUrl, null, confirmationMessage.value, data)
                 } else {
                     repo = shApis
                         .doPost(streamlineUrl, data);
@@ -93,13 +96,13 @@ const useStreamline = (stream, ...initialArgs) => {
                 loading.value = true
                 return repo.then((response) => {
                     loading.value = false
-                    if(confirmationMessage.value){
+                    if (confirmationMessage.value) {
                         confirmationMessage.value = null
 
-                        if(!response.isConfirmed){
+                        if (!response.isConfirmed) {
                             return
                         }
-                        if(response.value?.success){
+                        if (response.value?.success) {
                             return response.value.response
                         } else {
                             // throw error
@@ -108,8 +111,8 @@ const useStreamline = (stream, ...initialArgs) => {
 
                     }
 
-                        return response.data
-                    })
+                    return response.data
+                })
                     .catch((error) => {
                         loading.value = false
                         console.error(`Error calling ${prop} on stream ${stream}`, error)
@@ -120,28 +123,15 @@ const useStreamline = (stream, ...initialArgs) => {
     }
     const getActionUrl = (action, ...args) => {
         let newStream = stream
-        if(action.includes(':')){
+        if (action.includes(':')) {
             [newStream, action] = action.split(':')
         }
         const post = {
             action,
-            stream:newStream,
+            stream: newStream,
             params: args
         }
         return `${streamlineUrl}?${new URLSearchParams(post).toString()}`
-
-        // // Add each arg as a separate param
-        // args.forEach((arg, index) => {
-        //     let value = arg;
-        //     if (typeof arg === 'object' && !(arg instanceof Date)) {
-        //         value = JSON.stringify(arg);
-        //     } else if (arg instanceof Date) {
-        //         value = arg.toISOString();
-        //     }
-        //     params.append(`params[${index}]`, value);
-        // })
-
-        // return `${streamlineUrl}?${params.toString()}`
     }
 
     const service = reactive({})
@@ -152,14 +142,16 @@ const useStreamline = (stream, ...initialArgs) => {
         return new Proxy(service, handler)
     }
 
-    onMounted(() => {
+    onMounted(async () => {
+        if (enableCache) {
+            const cachedData = await Cache.get(cacheKey)
+            if (cachedData) {
+                assignProperties(cachedData)
+                propertiesFetched.value = true
+            }
+        }
         if (initialArgs.length > 0) {
             fetchServiceProperties()
-        }
-        if (!enableCache) return
-        const cachedData = localStorage.getItem(cacheKey)
-        if (cachedData) {
-            assignProperties(JSON.parse(cachedData))
         }
     })
 
