@@ -147,7 +147,6 @@ const useStreamline = (stream, ...initialArgs) => {
             const cachedData = await Cache.get(cacheKey)
             if (cachedData) {
                 assignProperties(cachedData)
-                propertiesFetched.value = true
             }
         }
         if (initialArgs.length > 0) {
