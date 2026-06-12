@@ -1,8 +1,7 @@
-import useStreamline from './composables/useStreamline.js'
-import getActionUrl from './composables/getActionUrl.js'
+// v2: vue-streamline is a compatibility shim over @iankibetsh/sh-core,
+// which now ships streamline as a first-class module. New code should
+// import from '@iankibetsh/sh-core' directly.
 import streamline from './plugins/streamline.js'
-export {
-    useStreamline,
-    getActionUrl,
-    streamline
-}
+
+export { useStreamline, getActionUrl } from '@iankibetsh/sh-core'
+export { streamline }

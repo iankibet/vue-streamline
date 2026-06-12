@@ -1,4 +1,7 @@
-# Streamline Vue Plugin
+# Streamline Vue Plugin (DEPRECATED — moved into @iankibetsh/sh-core)
+
+
+> **⚠️ Deprecated as of v2.** The streamline implementation now ships inside [`@iankibetsh/sh-core`](https://www.npmjs.com/package/@iankibetsh/sh-core) — import `useStreamline` / `getActionUrl` from there. v2 of this package is a thin re-export shim kept for backward compatibility; the `streamlineHeaders` option is ignored (auth is handled by the sh-core API client).
 
 A robust Vue 3 plugin designed for seamless integration with Streamline backend services. It delivers reactive state management, intelligent caching, and dynamic action invocation.
 

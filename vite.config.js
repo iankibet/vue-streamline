@@ -12,10 +12,11 @@ export default defineConfig({
     },
     rollupOptions: {
       // Make sure to externalize deps that shouldn't be bundled into your library
-      external: ['vue'],
+      external: ['vue', '@iankibetsh/sh-core'],
       output: {
         globals: {
           vue: 'Vue',
+          '@iankibetsh/sh-core': 'ShCore',
         },
       },
     },
